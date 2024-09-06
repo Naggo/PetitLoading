@@ -64,12 +64,15 @@ class LoadingWindow:
             for i in range(self.image.n_frames):
                 self.image.seek(i)
                 frame = self.image.copy()
-                frame.thumbnail((self.rect.width, self.rect.height), Image.NEAREST)
+                self.convert_image(frame)
                 self.frames.append(FrameTk(frame, frame.info["duration"]))
         else:
             frame = self.image.copy()
-            frame.thumbnail((self.rect.width, self.rect.height), Image.NEAREST)
+            self.convert_image(frame)
             self.frames.append(FrameTk(frame, 500))
+
+    def convert_image(self, image: Image.Image):
+        image.thumbnail((self.rect.width, self.rect.height), Image.NEAREST)
 
     def init_canvas(self):
         # canvasを作成
@@ -120,13 +123,13 @@ class LoadingWindow:
         self.window.wm_overrideredirect(False)
         self.window.wm_iconify()
 
-    def on_visibility_changed(self, event):
+    def on_visibility_changed(self, event: tkinter.Event):
         # ウィンドウの状態を取得
         state = self.window.wm_state()
         if state == "normal":
             self.window.wm_overrideredirect(True)
 
-    def on_right_clicked(self, event):
+    def on_right_clicked(self, event: tkinter.Event):
         # ポップアップを表示
         self.pmenu.post(event.x_root, event.y_root)
 
