@@ -63,16 +63,17 @@ class LoadingWindow:
         if (isinstance(self.image, GifImagePlugin.GifImageFile) and self.image.is_animated):
             for i in range(self.image.n_frames):
                 self.image.seek(i)
-                frame = self.image.copy()
-                self.convert_image(frame)
+                frame = self.convert_image(self.image)
                 self.frames.append(FrameTk(frame, frame.info["duration"]))
         else:
-            frame = self.image.copy()
-            self.convert_image(frame)
+            frame = self.convert_image(self.image)
             self.frames.append(FrameTk(frame, 500))
 
-    def convert_image(self, image: Image.Image):
-        image.thumbnail((self.rect.width, self.rect.height), Image.NEAREST)
+    def convert_image(self, image: Image.Image) -> Image.Image:
+        # 画像を表示用に加工
+        result = image.copy()
+        result.thumbnail((self.rect.width, self.rect.height), Image.NEAREST)
+        return result
 
     def init_canvas(self):
         # canvasを作成
