@@ -12,7 +12,7 @@ using UnityEditor.Compilation;
 
 namespace PetitLoading.Editor {
     [InitializeOnLoad]
-    public class PetitLoadingCore {
+    public static class PetitLoadingCore {
         const string TempFileName = "PetitLoadingFlag_Deletable.tmp";
 
 
@@ -26,6 +26,7 @@ namespace PetitLoading.Editor {
 
 
         static int updateCount;
+        static string tempFilePath;
 
         static PetitLoadingCore() {
             updateCount = 0;
@@ -38,11 +39,15 @@ namespace PetitLoading.Editor {
             if (updateCount < 2) return;
 
             EditorApplication.update -= FirstSetup;
-            StopAnimation();
             Setup();
+            StopAnimation();
         }
 
         public static void Setup() {
+            tempFilePath = Path.GetFullPath(
+                Path.Join(Application.temporaryCachePath, TempFileName)
+            );
+
             CompilationPipeline.compilationStarted -= CompilationStarted;
             CompilationPipeline.assemblyCompilationFinished -= AssemblyCompilationFinished;
             if (PetitLoadingSettings.instance.enabled) {
@@ -66,15 +71,11 @@ namespace PetitLoading.Editor {
 
 
         public static void StartAnimation() {
-            string tempFilePath = Path.GetFullPath(
-                Path.Combine(Application.temporaryCachePath, TempFileName)
-            );
-
             if (File.Exists(tempFilePath)) return;
 
             string sourceFilePath = GetSourceFilePath();
             string pythonFilePath = Path.GetFullPath(
-                Path.Combine(sourceFilePath, "..", "..", "PyScripts~", "invoker.py")
+                Path.Join(sourceFilePath, "../../PyScripts~/invoker.py")
             );
             PetitLoadingSettings settings = PetitLoadingSettings.instance;
             string imagesFolderPath = settings.imagesPath;
@@ -90,10 +91,6 @@ namespace PetitLoading.Editor {
         }
 
         public static void StopAnimation() {
-            string tempFilePath = Path.GetFullPath(
-                Path.Combine(Application.temporaryCachePath, TempFileName)
-            );
-
             File.Delete(tempFilePath);
         }
 
