@@ -19,7 +19,7 @@ class AnchoredRect:
         return f"{self.width}x{self.height}+{x}+{y}"
 
     def _calculate_x(self, screen_width: int) -> int:
-        if self.anchor[1] == "E":
+        if self.anchor[1] == "W":
             return self.x
         else:
             return screen_width - (self.x + self.width)

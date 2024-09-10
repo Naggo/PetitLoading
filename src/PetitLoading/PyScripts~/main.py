@@ -9,7 +9,7 @@ from PIL import Image, ImageTk, GifImagePlugin
 from anchoredrect import AnchoredRect
 
 
-RECT = AnchoredRect(32, 128, 128, 128, "SW")
+RECT = AnchoredRect(32, 128, 128, 128, "SE")
 SUPPORTED_FILES = [
     ".gif",
     ".png"

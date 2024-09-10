@@ -14,7 +14,7 @@ namespace PetitLoading.Editor {
         public int y = 128;
         public int width = 128;
         public int height = 128;
-        public string anchor = "SW";
+        public string anchor = "SE";
 
         public void Save() {
             Save(true);
