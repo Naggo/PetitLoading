@@ -1,6 +1,13 @@
 # Petit Loading
 
-Loading animations.
+Unityのコンパイル中にgifアニメーションを表示するパッケージです。
+
+Windowsのみ対応しており、Python3とPillowライブラリが必要です。
+
+## 使い方
+
+画面上部の`Tools/Petit Loading`からウィンドウを開き、
+有効化、画像フォルダ、座標の設定をすることができます。
 
 -----
 
