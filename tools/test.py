@@ -19,7 +19,7 @@ def setpath():
 
 def start():
     flagpath.touch()
-    cmd = ["pythonw", str(invokerpath), str(flagpath), imagespath.get(), rectstring]
+    cmd = ["python3", str(invokerpath), str(flagpath), imagespath.get(), rectstring]
     subprocess.Popen(cmd)
 
 

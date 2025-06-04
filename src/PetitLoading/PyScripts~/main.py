@@ -1,5 +1,6 @@
 from pathlib import Path
 import ctypes
+import os
 import random
 import sys
 import tkinter
@@ -14,6 +15,13 @@ SUPPORTED_FILES = [
     ".gif",
     ".png"
 ]
+
+
+def is_windows():
+    return os.name == "nt"
+
+def is_mac():
+    return os.name == "posix"
 
 
 class FrameTk:
@@ -41,7 +49,6 @@ class LoadingWindow:
         ))
         self.window.wm_overrideredirect(True)
         self.window.wm_attributes("-topmost", True)
-        self.window.wm_attributes("-transparentcolor", self.BG_COLOR)
         self.window.bind('<Visibility>', self.on_visibility_changed)
 
         self.current_frame = 0
@@ -50,6 +57,8 @@ class LoadingWindow:
 
         self.canvas: tkinter.Canvas
         self.init_canvas()
+
+        self.set_transparent()
 
         self.pmenu = tkinter.Menu(self.window, tearoff=0)
         self.pmenu.add_command(label="Hide", command=self.hide_window)
@@ -80,8 +89,7 @@ class LoadingWindow:
         self.canvas = tkinter.Canvas(
             self.window,
             width=self.rect.width,
-            height=self.rect.height,
-            bg=self.BG_COLOR
+            height=self.rect.height
         )
 
         # 枠を消すためにマイナス値を指定
@@ -96,6 +104,17 @@ class LoadingWindow:
             image=frame.image_tk,
             tag="img"
         )
+
+    def set_transparent(self):
+        if is_windows():
+            self.window.wm_attributes("-transparentcolor", self.BG_COLOR)
+            self.canvas.config(bg=self.BG_COLOR)
+
+        elif is_mac():
+            self.window.wm_attributes("-transparent", True)
+            self.window.config(bg="systemTransparent")
+            self.canvas.config(bg="systemTransparent")
+            print(self.window.wm_geometry())
 
     def start_animation(self, flagpath):
         # ループを開始
@@ -173,7 +192,8 @@ def get_rect(rectstring: str):
 
 
 def main():
-    ctypes.windll.shcore.SetProcessDpiAwareness(True)
+    if is_windows():
+        ctypes.windll.shcore.SetProcessDpiAwareness(True)
 
     image = get_image(sys.argv[2])
     rect = get_rect(sys.argv[3])
