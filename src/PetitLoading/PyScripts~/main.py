@@ -34,7 +34,7 @@ class FrameTk:
 class LoadingWindow:
     """original: https://qiita.com/magiclib/items/89447ffbf42371cd6538"""
 
-    FRAME_OFFSET = -2
+    FRAME_OFFSET = -3
     BG_COLOR = "snow"
 
     def __init__(self, image: Image.Image, rect: AnchoredRect):
@@ -47,6 +47,8 @@ class LoadingWindow:
             self.window.winfo_screenwidth(),
             self.window.winfo_screenheight()
         ))
+        self.window.wm_resizable(False, False)
+        self.window.update_idletasks()
         self.window.wm_overrideredirect(True)
         self.window.wm_attributes("-topmost", True)
         self.window.bind('<Visibility>', self.on_visibility_changed)
@@ -108,13 +110,12 @@ class LoadingWindow:
     def set_transparent(self):
         if is_windows():
             self.window.wm_attributes("-transparentcolor", self.BG_COLOR)
-            self.canvas.config(bg=self.BG_COLOR)
+            self.canvas.configure(bg=self.BG_COLOR)
 
         elif is_mac():
             self.window.wm_attributes("-transparent", True)
-            self.window.config(bg="systemTransparent")
-            self.canvas.config(bg="systemTransparent")
-            print(self.window.wm_geometry())
+            self.window.configure(bg="systemTransparent")
+            self.canvas.configure(bg="systemTransparent")
 
     def start_animation(self, flagpath):
         # ループを開始
