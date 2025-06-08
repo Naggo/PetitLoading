@@ -1,5 +1,6 @@
 from pathlib import Path
 import ctypes
+import os
 import random
 import sys
 import tkinter
@@ -16,6 +17,13 @@ SUPPORTED_FILES = [
 ]
 
 
+def is_windows():
+    return os.name == "nt"
+
+def is_mac():
+    return os.name == "posix"
+
+
 class FrameTk:
     def __init__(self, image: Image.Image, interval: int):
         self.image = image
@@ -26,8 +34,6 @@ class FrameTk:
 class LoadingWindow:
     """original: https://qiita.com/magiclib/items/89447ffbf42371cd6538"""
 
-    FRAME_OFFSET = -2
-    BG_COLOR = "snow"
 
     def __init__(self, image: Image.Image, rect: AnchoredRect):
         self.image = image
@@ -39,9 +45,11 @@ class LoadingWindow:
             self.window.winfo_screenwidth(),
             self.window.winfo_screenheight()
         ))
+        self.window.wm_resizable(False, False)
+        if is_mac():
+            self.window.update_idletasks()
         self.window.wm_overrideredirect(True)
         self.window.wm_attributes("-topmost", True)
-        self.window.wm_attributes("-transparentcolor", self.BG_COLOR)
         self.window.bind('<Visibility>', self.on_visibility_changed)
 
         self.current_frame = 0
@@ -50,6 +58,8 @@ class LoadingWindow:
 
         self.canvas: tkinter.Canvas
         self.init_canvas()
+
+        self.set_transparent()
 
         self.pmenu = tkinter.Menu(self.window, tearoff=0)
         self.pmenu.add_command(label="Hide", command=self.hide_window)
@@ -80,13 +90,16 @@ class LoadingWindow:
         self.canvas = tkinter.Canvas(
             self.window,
             width=self.rect.width,
-            height=self.rect.height,
-            bg=self.BG_COLOR
+            height=self.rect.height
         )
 
         # 枠を消すためにマイナス値を指定
-        self.canvas.place(x=self.FRAME_OFFSET,
-                          y=self.FRAME_OFFSET)
+        if is_mac():
+            FRAME_OFFSET = -3
+        else:
+            FRAME_OFFSET = -2
+        self.canvas.place(x=FRAME_OFFSET,
+                          y=FRAME_OFFSET)
 
         # canvasに画像を表示
         frame = self.frames[0]
@@ -96,6 +109,18 @@ class LoadingWindow:
             image=frame.image_tk,
             tag="img"
         )
+
+    def set_transparent(self):
+        if is_windows():
+            BG_COLOR = "snow"
+            self.window.wm_attributes("-transparentcolor", BG_COLOR)
+            self.canvas.configure(bg=BG_COLOR)
+
+        elif is_mac():
+            BG_COLOR = "systemTransparent"
+            self.window.wm_attributes("-transparent", True)
+            self.window.configure(bg=BG_COLOR)
+            self.canvas.configure(bg=BG_COLOR)
 
     def start_animation(self, flagpath):
         # ループを開始
@@ -173,7 +198,8 @@ def get_rect(rectstring: str):
 
 
 def main():
-    ctypes.windll.shcore.SetProcessDpiAwareness(True)
+    if is_windows():
+        ctypes.windll.shcore.SetProcessDpiAwareness(True)
 
     image = get_image(sys.argv[2])
     rect = get_rect(sys.argv[3])

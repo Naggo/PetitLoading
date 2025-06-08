@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 import subprocess
 import tkinter
 import tkinter.filedialog as filedialog
@@ -12,6 +13,13 @@ rectstring = "32,128,128,128,SE"
 imagespath: tkinter.StringVar
 
 
+def is_windows():
+    return os.name == "nt"
+
+def is_mac():
+    return os.name == "posix"
+
+
 def setpath():
     path = filedialog.askdirectory()
     imagespath.set(path)
@@ -19,7 +27,10 @@ def setpath():
 
 def start():
     flagpath.touch()
-    cmd = ["pythonw", str(invokerpath), str(flagpath), imagespath.get(), rectstring]
+    name = "python3"
+    if is_windows():
+        name = "pythonw"
+    cmd = [name, str(invokerpath), str(flagpath), imagespath.get(), rectstring]
     subprocess.Popen(cmd)
 
 
