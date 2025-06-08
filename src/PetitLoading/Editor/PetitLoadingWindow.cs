@@ -1,7 +1,6 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEditor;
 
@@ -122,6 +121,22 @@ namespace PetitLoading.Editor {
                 if (GUILayout.Button("Stop")) {
                     PetitLoadingCore.StopAnimation();
                 }
+            }
+            if (GUILayout.Button("Test")) {
+                Task.Run(async () => {
+                    var p = PetitLoadingCore.StartAnimation();
+                    await Task.Delay(1000);
+                    PetitLoadingCore.StopAnimation();
+                    p.WaitForExit(500);
+                    var output = await p.StandardOutput.ReadToEndAsync();
+                    var err = await p.StandardError.ReadToEndAsync();
+                    if (!string.IsNullOrEmpty(output)) {
+                        Debug.Log(output);
+                    }
+                    if (!string.IsNullOrEmpty(err)) {
+                        Debug.LogWarning(err);
+                    }
+                });
             }
         }
 

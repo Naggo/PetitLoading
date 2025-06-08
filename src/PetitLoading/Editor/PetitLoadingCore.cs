@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -70,8 +69,8 @@ namespace PetitLoading.Editor {
         }
 
 
-        public static void StartAnimation() {
-            if (File.Exists(tempFilePath)) return;
+        public static Process StartAnimation() {
+            if (File.Exists(tempFilePath)) return null;
 
             string sourceFilePath = GetSourceFilePath();
             string pythonFilePath = Path.GetFullPath(
@@ -84,10 +83,22 @@ namespace PetitLoading.Editor {
             File.Create(tempFilePath).Close();
 
             ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.FileName = "pythonw";
-            startInfo.Arguments = $"\"{pythonFilePath}\" \"{tempFilePath}\" \"{imagesFolderPath}\" \"{rectString}\"";
+            var platform = Environment.OSVersion.Platform;
+            if (platform is PlatformID.Win32NT) {
+                startInfo.FileName = "pythonw";
+                startInfo.Arguments = $"\"{pythonFilePath}\" \"{tempFilePath}\" \"{imagesFolderPath}\" \"{rectString}\"";
+            } else if (platform is PlatformID.Unix or PlatformID.MacOSX) {
+                startInfo.FileName = "/bin/zsh";
+                startInfo.Arguments = $"-l -c 'python3 \"{pythonFilePath}\" \"{tempFilePath}\" \"{imagesFolderPath}\" \"{rectString}\"'";
+            } else {
+                startInfo.FileName = "python3";
+                startInfo.Arguments = $"\"{pythonFilePath}\" \"{tempFilePath}\" \"{imagesFolderPath}\" \"{rectString}\"";
+            }
 
-            Process.Start(startInfo);
+            startInfo.UseShellExecute = false;
+            startInfo.RedirectStandardOutput = true;
+            startInfo.RedirectStandardError = true;
+            return Process.Start(startInfo);
         }
 
         public static void StopAnimation() {
