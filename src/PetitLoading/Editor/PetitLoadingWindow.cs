@@ -125,6 +125,7 @@ namespace PetitLoading.Editor {
             if (GUILayout.Button("Test")) {
                 Task.Run(async () => {
                     var p = PetitLoadingCore.StartAnimation();
+                    if (p is null) return;
                     await Task.Delay(1000);
                     PetitLoadingCore.StopAnimation();
                     p.WaitForExit(500);
