@@ -128,7 +128,7 @@ namespace PetitLoading.Editor {
                     if (p is null) return;
                     await Task.Delay(1000);
                     PetitLoadingCore.StopAnimation();
-                    p.WaitForExit(500);
+                    p.WaitForExit(1000);
                     var output = await p.StandardOutput.ReadToEndAsync();
                     var err = await p.StandardError.ReadToEndAsync();
                     if (!string.IsNullOrEmpty(output)) {
