@@ -1,8 +1,8 @@
 from dataclasses import dataclass
-from typing import TypeAlias, Literal
+from typing import Literal
 
 
-Anchor: TypeAlias = Literal["NE", "NW", "SE", "SW"]
+Anchor = Literal["NE", "NW", "SE", "SW"]
 
 
 @dataclass

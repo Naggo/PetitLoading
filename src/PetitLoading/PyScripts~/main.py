@@ -45,12 +45,6 @@ class LoadingWindow:
             self.window.winfo_screenwidth(),
             self.window.winfo_screenheight()
         ))
-        self.window.wm_resizable(False, False)
-        if is_mac():
-            self.window.update_idletasks()
-        self.window.wm_overrideredirect(True)
-        self.window.wm_attributes("-topmost", True)
-        self.window.bind('<Visibility>', self.on_visibility_changed)
 
         self.current_frame = 0
         self.frames: list[FrameTk]
@@ -60,6 +54,13 @@ class LoadingWindow:
         self.init_canvas()
 
         self.set_transparent()
+
+        self.window.wm_attributes("-topmost", True)
+        self.window.wm_resizable(False, False)
+        if is_mac():
+            self.window.update_idletasks()
+        self.window.wm_overrideredirect(True)
+        self.window.bind('<Visibility>', self.on_visibility_changed)
 
         self.pmenu = tkinter.Menu(self.window, tearoff=0)
         self.pmenu.add_command(label="Hide", command=self.hide_window)
@@ -81,7 +82,7 @@ class LoadingWindow:
 
     def convert_image(self, image: Image.Image) -> Image.Image:
         # 画像を表示用に加工
-        result = image.copy()
+        result = image.convert("RGBA")
         result.thumbnail((self.rect.width, self.rect.height), Image.NEAREST)
         return result
 
